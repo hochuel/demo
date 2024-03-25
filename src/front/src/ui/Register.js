@@ -6,8 +6,17 @@ import { Modal as BaseModal } from '@mui/base/Modal';
 import { useForm } from 'react-hook-form';
 import Button from "@mui/material/Button";
 import {TextField} from "@mui/material";
+import axios from "axios";
 
-export default function ModalUnstyled() {
+
+async function setRegister(formData) {
+    const response = await axios.post(
+        '/api/dirs', formData
+    );
+    return response.data;
+}
+
+export default async function ModalUnstyled() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -16,6 +25,8 @@ export default function ModalUnstyled() {
 
     const onSubmit = (data) => {
         console.log(JSON.stringify(data));
+        let recevData = setRegister(data);
+        alert(recevData);
     };
 
     return (
@@ -28,30 +39,30 @@ export default function ModalUnstyled() {
                 aria-describedby="unstyled-modal-description"
                 open={open}
                 onClose={handleClose}
-                slots={{ backdrop: StyledBackdrop }}
+                slots={{backdrop: StyledBackdrop}}
             >
-                <ModalContent sx={{ width: 400 }}>
+                <ModalContent sx={{width: 400}}>
                     <form onSubmit={handleSubmit(onSubmit)}>
 
                         <TextField
-                            style={{ width: "400px", margin: "5px" }}
+                            style={{width: "400px", margin: "5px"}}
                             type="text"
                             label="Api key"
                             variant="outlined"
-                            name = 'apiKey'
-                            {...register('apiKey', {required:{value:true}})}
+                            name='apiKey'
+                            {...register('apiKey', {required: {value: true}})}
                         />
 
                         <TextField
-                            style={{ width: "400px", margin: "5px" }}
+                            style={{width: "400px", margin: "5px"}}
                             type="text"
                             label="Authority key"
                             variant="outlined"
-                            name = "authriryKey"
-                            {...register('authriryKey', {required:{value:true}})}
+                            name="authriryKey"
+                            {...register('authriryKey', {required: {value: true}})}
                         />
 
-                        <br />
+                        <br/>
                         <Button type="submit" variant="contained" color="primary">확인</Button>
 
                     </form>

@@ -126,23 +126,23 @@ export default function PersistentDrawerLeft() {
     const closeAlert = () =>{
         setAlertOption({open:false});
     }
-    const openAlertMain = useCallback(()=>{
+    const openModalHandler = useCallback(()=>{
         alertInitialState.open = true;
         alertInitialState.title = "알림";
         alertInitialState.message = "설정된 값이 없습니다.";
-        alertInitialState.rightButton = {state:true, name:'설정화면', callFun:closeAlertMain};
+        alertInitialState.rightButton = {state:true, name:'설정화면', callFun:closeModalHandler};
         alertInitialState.leftButton = {state:false, name:'', callFun:null};
         setAlertOption(alertInitialState);
     }, [])
 
 
-    const closeAlertMain = ()=> {
+    const closeModalHandler = ()=> {
         setAlertOption({open:false});
 
         setConfigState(true);
     }
 
-    const configModalOpen = () => {
+    const closeRegViewModal = () => {
         setConfigState(false);
 
         alertInitialState.open = true;
@@ -159,10 +159,10 @@ export default function PersistentDrawerLeft() {
         const data = await getCheckConfig();
         setCheckConfig(data);
         if (checkConfig.cd !== '0000') {
-            openAlertMain();
+            openModalHandler();
         }
         console.log(data);
-    }, [checkConfig.cd, openAlertMain]);
+    }, [checkConfig.cd, openModalHandler]);
 
     useEffect(() => {
         fetchData();
@@ -247,7 +247,7 @@ export default function PersistentDrawerLeft() {
                                              rightButton={alertOption.rightButton}
                                              leftButton={alertOption.leftButton}/>}
 
-                {configState && <ModalUnstyled openModal={configState} callFun={configModalOpen}/>}
+                {configState && <ModalUnstyled openModal={configState} callFun={closeRegViewModal}/>}
             </div>
         </Box>
     );

@@ -110,8 +110,8 @@ export default function PersistentDrawerLeft() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
 
-    const [alertOption, setAlertOPtion] = useState(()=>alertInitialState);
-    const [regViewIsOpen, setRegViewIsOpen] = useState(false);
+    const [alertOption, setAlertOption] = useState(alertInitialState);
+    const [configState, setConfigState] = useState(false);
 
     const [checkConfig, setCheckConfig] = useState({cd: '', mg: ''})
 
@@ -124,33 +124,33 @@ export default function PersistentDrawerLeft() {
     };
 
     const closeAlert = () =>{
-        setAlertOPtion({open:false});
+        setAlertOption({open:false});
     }
-    const openModalHandler = useCallback(()=>{
+    const openAlertMain = useCallback(()=>{
         alertInitialState.open = true;
         alertInitialState.title = "알림";
         alertInitialState.message = "설정된 값이 없습니다.";
-        alertInitialState.rightButton = {state:true, name:'설정화면', callFun:closeModalHandler};
+        alertInitialState.rightButton = {state:true, name:'설정화면', callFun:closeAlertMain};
         alertInitialState.leftButton = {state:false, name:'', callFun:null};
-        setAlertOPtion(alertInitialState);
+        setAlertOption(alertInitialState);
     }, [])
 
 
-    const closeModalHandler = ()=> {
-        setAlertOPtion({open:false});
+    const closeAlertMain = ()=> {
+        setAlertOption({open:false});
 
-        setRegViewIsOpen(true);
+        setConfigState(true);
     }
 
-    const closeRegViewModal = () => {
-        setRegViewIsOpen(false);
+    const configModalOpen = () => {
+        setConfigState(false);
 
         alertInitialState.open = true;
         alertInitialState.title = "확인";
         alertInitialState.message = "저장 하였습니다.";
         alertInitialState.rightButton = {state:false, name:'', callFun:null};
         alertInitialState.leftButton = {state:true, name:'닫기', callFun:closeAlert};
-        setAlertOPtion(alertInitialState);
+        setAlertOption(alertInitialState);
     }
 
 
@@ -159,10 +159,10 @@ export default function PersistentDrawerLeft() {
         const data = await getCheckConfig();
         setCheckConfig(data);
         if (checkConfig.cd !== '0000') {
-            openModalHandler();
+            openAlertMain();
         }
         console.log(data);
-    }, [checkConfig.cd, openModalHandler]);
+    }, [checkConfig.cd, openAlertMain]);
 
     useEffect(() => {
         fetchData();
@@ -247,7 +247,7 @@ export default function PersistentDrawerLeft() {
                                              rightButton={alertOption.rightButton}
                                              leftButton={alertOption.leftButton}/>}
 
-                {regViewIsOpen && <ModalUnstyled openModal={regViewIsOpen} callFun={closeRegViewModal}/>}
+                {configState && <ModalUnstyled openModal={configState} callFun={configModalOpen}/>}
             </div>
         </Box>
     );

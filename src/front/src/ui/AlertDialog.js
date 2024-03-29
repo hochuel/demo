@@ -6,41 +6,45 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-export default function AlertDialog(prob) {
+interface AlertProb{
+    openModal : boolean;
+    rightButton : {state:false, name:'', callFun:object};
+    leftButton : {state:false, name:'', callFun:object};
+    title?: string;
+    msg? : string;
+}
 
-    const [open, setOpen] = React.useState(false);
+export default function AlertDialog(prop: AlertProb) {
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+    let rightButton;
+    let leftButton;
 
-    const handleClose = () => {
-        prob.AlertFunc();
-        setOpen(false);
-    };
+    if(prop.rightButton.state){
+
+        rightButton = <Button onClick={prop.rightButton.callFun}>{prop.rightButton.name}</Button>;
+    }
+
+    if(prop.leftButton.state){
+        leftButton = <Button onClick={prop.leftButton.callFun}>{prop.leftButton.name}</Button>;
+    }
 
     return (
         <React.Fragment>
-            <Button variant="outlined" onClick={handleClickOpen}>
-                Open alert dialog
-            </Button>
             <Dialog
-                open={open}
-                onClose={handleClose}
+                open={prop.openModal}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {prob.title}
+                    {prop.title ? prop.title : '제목'}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        {prob.msg}
+                        {prop.msg ? prop.msg : '메세지내용 없음'}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>{prob.complateButton}</Button>
-                    <Button onClick={handleClose} autoFocus>{prob.closeButton}</Button>
+                    {leftButton}{rightButton}
                 </DialogActions>
             </Dialog>
         </React.Fragment>

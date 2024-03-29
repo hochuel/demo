@@ -6,39 +6,36 @@ import { Modal as BaseModal } from '@mui/base/Modal';
 import { useForm } from 'react-hook-form';
 import Button from "@mui/material/Button";
 import {TextField} from "@mui/material";
-import axios from "axios";
 
 
-async function setRegister(formData) {
-    const response = await axios.post(
-        '/api/dirs', formData
-    );
-    return response.data;
+
+interface ModalProp{
+    openModal : boolean;
+    callFun : () => void;
 }
 
-export default async function ModalUnstyled() {
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+export default function ModalUnstyled(prop:ModalProp) {
 
     const {handleSubmit, register} = useForm();
 
+
+
     const onSubmit = (data) => {
         console.log(JSON.stringify(data));
-        let recevData = setRegister(data);
-        alert(recevData);
+
+
+        prop.callFun();
+
     };
+
+
 
     return (
         <div>
-            <TriggerButton type="button" onClick={handleOpen}>
-                Open modal
-            </TriggerButton>
             <Modal
                 aria-labelledby="unstyled-modal-title"
                 aria-describedby="unstyled-modal-description"
-                open={open}
-                onClose={handleClose}
+                open={prop.openModal}
                 slots={{backdrop: StyledBackdrop}}
             >
                 <ModalContent sx={{width: 400}}>
@@ -63,8 +60,7 @@ export default async function ModalUnstyled() {
                         />
 
                         <br/>
-                        <Button type="submit" variant="contained" color="primary">확인</Button>
-
+                        <Button type="submit" variant="contained" color="primary">저장</Button>
                     </form>
                 </ModalContent>
             </Modal>
@@ -86,15 +82,6 @@ const Backdrop = React.forwardRef((props, ref) => {
 Backdrop.propTypes = {
     className: PropTypes.string.isRequired,
     open: PropTypes.bool,
-};
-
-const blue = {
-    200: '#99CCFF',
-    300: '#66B2FF',
-    400: '#3399FF',
-    500: '#007FFF',
-    600: '#0072E5',
-    700: '#0066CC',
 };
 
 const grey = {
@@ -157,37 +144,6 @@ const ModalContent = styled('div')(
       font-weight: 400;
       color: ${theme.palette.mode === 'dark' ? grey[400] : grey[800]};
       margin-bottom: 4px;
-    }
-  `,
-);
-
-const TriggerButton = styled('button')(
-    ({ theme }) => css`
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 150ms ease;
-    cursor: pointer;
-    background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
-    border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
-    color: ${theme.palette.mode === 'dark' ? grey[200] : grey[900]};
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-
-    &:hover {
-      background: ${theme.palette.mode === 'dark' ? grey[800] : grey[50]};
-      border-color: ${theme.palette.mode === 'dark' ? grey[600] : grey[300]};
-    }
-
-    &:active {
-      background: ${theme.palette.mode === 'dark' ? grey[700] : grey[100]};
-    }
-
-    &:focus-visible {
-      box-shadow: 0 0 0 4px ${theme.palette.mode === 'dark' ? blue[300] : blue[200]};
-      outline: none;
     }
   `,
 );

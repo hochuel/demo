@@ -18,8 +18,35 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import axios from "axios";
+import {useCallback, useEffect, useState} from "react";
+import AlertDialog from "./AlertDialog";
+import ModalUnstyled from "./Register";
 
-import StockDataTable from "../components/data_grid";
+
+const instance = axios.create({
+    baseURL: "http://localhost:8080",
+    headers: {
+        "Content-Type": `application/json;charset=UTF-8`,
+        "Accept": "application/json",
+
+        "Access-Control-Allow-Origin": `http://localhost:3000`,
+        'Access-Control-Allow-Credentials':"true",
+    }
+});
+
+async function getCheckConfig(){
+    try {
+        const response = await instance.get("http://localhost:8080/sample/getCheckConfig");
+        //console.log(JSON.stringify(response.data));
+        return response.data;
+    }catch(error){
+        console.error('Error :', error)
+        return {cd:'9999', msg:error}
+    }
+}
+
+
 
 const drawerWidth = 240;
 
@@ -68,9 +95,25 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
+
+const alertInitialState = {
+    open : false,
+    title : '',
+    message : '',
+    rightButton : '',
+    leftButton : ''
+}
+
+
+
 export default function PersistentDrawerLeft() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+
+    const [alertOption, setAlertOPtion] = useState(()=>alertInitialState);
+    const [regViewIsOpen, setRegViewIsOpen] = useState(false);
+
+    const [checkConfig, setCheckConfig] = useState({cd: '', mg: ''})
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -80,7 +123,53 @@ export default function PersistentDrawerLeft() {
         setOpen(false);
     };
 
+    const closeAlert = () =>{
+        setAlertOPtion({open:false});
+    }
+    const openModalHandler = useCallback(()=>{
+        alertInitialState.open = true;
+        alertInitialState.title = "알림";
+        alertInitialState.message = "설정된 값이 없습니다.";
+        alertInitialState.rightButton = {state:true, name:'설정화면', callFun:closeModalHandler};
+        alertInitialState.leftButton = {state:false, name:'', callFun:null};
+        setAlertOPtion(alertInitialState);
+    }, [])
+
+
+    const closeModalHandler = ()=> {
+        setAlertOPtion({open:false});
+
+        setRegViewIsOpen(true);
+    }
+
+    const closeRegViewModal = () => {
+        setRegViewIsOpen(false);
+
+        alertInitialState.open = true;
+        alertInitialState.title = "확인";
+        alertInitialState.message = "저장 하였습니다.";
+        alertInitialState.rightButton = {state:false, name:'', callFun:null};
+        alertInitialState.leftButton = {state:true, name:'닫기', callFun:closeAlert};
+        setAlertOPtion(alertInitialState);
+    }
+
+
+
+    const fetchData = useCallback(async ()=>{
+        const data = await getCheckConfig();
+        setCheckConfig(data);
+        if (checkConfig.cd !== '0000') {
+            openModalHandler();
+        }
+        console.log(data);
+    }, [checkConfig.cd, openModalHandler]);
+
+    useEffect(() => {
+        fetchData();
+    },[fetchData])
+
     return (
+
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
@@ -147,9 +236,19 @@ export default function PersistentDrawerLeft() {
             <Main open={open}>
                 <DrawerHeader />
                 <Typography paragraph>
-                   <StockDataTable />
+                    메인화면
                 </Typography>
             </Main>
+
+            <div>
+                {alertOption.open && <AlertDialog title={alertOption.title}
+                                             msg={alertOption.message}
+                                             openModal={alertOption.open}
+                                             rightButton={alertOption.rightButton}
+                                             leftButton={alertOption.leftButton}/>}
+
+                {regViewIsOpen && <ModalUnstyled openModal={regViewIsOpen} callFun={closeRegViewModal}/>}
+            </div>
         </Box>
     );
 }
